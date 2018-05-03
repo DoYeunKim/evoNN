@@ -11,7 +11,7 @@ int main() {
 	clock_t start;
 	double duration;
 
-	World world(50, 50, 10);
+	World world(10, 30, 1);
     
 	world.populateFood();
 	world.populateCreature();

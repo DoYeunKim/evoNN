@@ -11,7 +11,22 @@ int main() {
 	clock_t start;
 	double duration;
 
-	World world(10, 30, 1);
+	int m,f,c;
+	m = 10;
+	f = 20;
+	c = 10;
+
+	// Check for illegal world
+	if (f < 1 || c < 1) {
+		cout << "We need at least one food and one creature to work with." << endl;
+		return -1;
+	}
+	else if ((m * m) < (f + c)) {
+		cout << "The sum of food and creatures cannot exceed the amount of space provided in this world." << endl;
+		return -1;
+	} 
+
+	World world(m, f, c);
     
 	world.populateFood();
 	world.populateCreature();
@@ -24,5 +39,6 @@ int main() {
 		world.showWorld();
 	}
 
+	return 0;
 
 }

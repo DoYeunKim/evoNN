@@ -27,7 +27,7 @@ void Creature::showInfo() {
 	cout << "Speed: " << speed << endl;
 	cout << "Vision: " << vision << endl;
 	cout << "Energy Level: " << energy << endl;
-	cout << "Starving?: " << (isStarved ? "Yes" : "No") << endl;
+	cout << "Starving?: " << (starving ? "Yes" : "No") << endl;
 
 }
 

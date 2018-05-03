@@ -6,9 +6,10 @@
 #include <math.h>
 #include <vector>
 #include "Creature.h"
-#define defaultSize 20
-#define defaultFood 10
-#define defaultPop 10
+#define DEFAULT_SIZE 20
+#define DEFAULT_FOOD 10
+#define DEFAULT_POP 10
+#define FOOD_ENERGY 4
 
 using namespace std;
 
@@ -58,7 +59,7 @@ class  World {
 		// Functions dealing with moving the creatures
 		// showPos checks if it is possible for the creature to move into that space
 		// moveCreatures calls Creature.move() to actually do the moving if showPos returns true
-        bool showPos(int x, int y);
+        int showPos(int x, int y);
 		void moveCreatures();
 
 };

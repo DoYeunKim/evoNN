@@ -5,9 +5,9 @@ using namespace std;
 
 // Initialize the world with inate numbers and create the map
 World::World() {
-	mapSize = defaultSize;
-	amountFood = defaultFood;
-	popSize = defaultPop;
+	mapSize = DEFAULT_SIZE;
+	amountFood = DEFAULT_FOOD;
+	popSize = DEFAULT_POP;
 	cout << "Creating a world that is " << mapSize << " x " << mapSize << " in size" << endl;
 
 	for(int i = 0; i < mapSize; i++) {
@@ -21,6 +21,7 @@ World::World(int dim, int f, int c) {
 	mapSize = dim;
 	amountFood = f;
 	popSize = c;
+
 	cout << "Creating a world that is " << mapSize << " x " << mapSize << " in size" << endl;
 	
 	for(int i = 0; i < mapSize; i++) {
@@ -99,8 +100,8 @@ void World::showWorld() {
 
 // Check if there is anything at (x,y)
 // If (x,y) is out of bounds or if another creature is there, then we can't go there
-bool World::showPos(int x, int y){
-	bool canMove = false;
+int World::showPos(int x, int y){
+	int canMove = -1;
 	
 	// Check for bounds
 	if (mapSize <= x || x < 0) { 
@@ -117,7 +118,7 @@ bool World::showPos(int x, int y){
 		// If there is nothing, we can move there
 		case NIL: {
 					cout << "There is nothing here" << endl; 
-					canMove = true; 
+					canMove = NIL; 
 					break;
 					}
 		// If there is food, we can move there
@@ -125,11 +126,13 @@ bool World::showPos(int x, int y){
 		// Right now iterating through food, but maybe I should make foods a map instead of vector
 		case FOOD: {
 					cout << "There is food here" << endl; 
-					canMove = true;
+					canMove = FOOD;
 
 					for (vector<food>::iterator it = foods.begin(); it != foods.end(); it++) {
 						if (x == it->f_x && y == it->f_y) {
 							foods.erase(it);
+							cout << "Ate food" << endl;
+							break;
 						} 						
 					}
 
@@ -152,36 +155,68 @@ bool World::showPos(int x, int y){
 // Right now the amount of movement is randomized
 // When the animal moves, update the map to be NIL - this part is not working....
 void World::moveCreatures() {
-	int dx, dy, x, y, n_x, n_y;
+	int dx, dy, x, y, n_x, n_y, surviving;
+
+	surviving = creatures.size();
 	
 	// Iterate through creatures
 	for (vector<Creature>::iterator it = creatures.begin(); it != creatures.end(); it++) {
-		cout << "Was at (" << it->c_x << "," << it->c_y << ")" << endl;
+		//cout << "Was at (" << it->c_x << "," << it->c_y << ")" << endl;
+		if (it->isAlive) {
+		
+			x = it->c_x;
+			y = it->c_y;
+			it->energy--;
+		
+			// If the creature has run out of energy, it is starving
+			if (it->energy <= 0) {
+				it->starving++;
+				cout << "Starving... " << it->starving << endl;
+			}
+			// If the creature has been starving for 5 turns, then reduce its health
+			// If health reaches zero, then it is dead. update the map and break out of the loop
+			if (it->starving == 5) {
+				it->health--;
+				if(it->health <= 0) { 
+					it->isAlive = false;
+					cout << "This one is dead" << endl;
+					surviving--;
+					map[x][y] = NIL;		
+					continue; 
+				}
+			}
 
-		// Calculating dx and dy
-		// This will be provided by NN as I move along
-		dx = 1 - (rand() % 3);
-		dy = 1 - (rand() % 3);
-		x = it->c_x;
-		y = it->c_y;
-		n_x = (it->c_x) + dx;
-		n_y = (it->c_y) + dy;
+			// Calculating dx and dy
+			// This will be provided by NN as I move along
+			dx = 1 - (rand() % 3);
+			dy = 1 - (rand() % 3);
 
-		// If we can move into the new position
-		// Move and update the map	
-		if(showPos(n_x, n_y)) {
-			it->move(dx, dy);
-			cout << "The Creature is moving" << endl;
-			map[n_x][n_y] = CREATURE;
-			cout << "Moved Creature" << endl;
-			map[x][y] = NIL;
-			cout << "Updated Map" << endl;
+			n_x = (it->c_x) + dx;
+			n_y = (it->c_y) + dy;
+
+			// If we can move into the new position
+			// Move and update the map	
+			int result = showPos(n_x, n_y);
+			if(result > -1) {
+				if (result == FOOD) { 
+					it->starving == 0;
+					it->energy += FOOD_ENERGY;
+				}
+				it->move(dx, dy);
+				//cout << "The Creature is moving" << endl;
+				map[n_x][n_y] = CREATURE;
+				//cout << "Moved Creature" << endl;
+				map[x][y] = NIL;
+				//cout << "Updated Map" << endl;
+			}
+			//cout << "Now at (" << it->c_x << "," << it->c_y << ")" << endl;
+			cout << "Current energy level is " << it->energy << endl;
 		}
-		cout << "Now at (" << it->c_x << "," << it->c_y << ")" << endl;
 		
 	}
-	cout << endl;
-	
+	cout << surviving << " creatures survived this round" << endl;
+		
+
 	// Call populate food
 	// If the creatures ate something, food will be repopulated
 	// Else, nothing happens

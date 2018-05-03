@@ -5,18 +5,22 @@
 
 class Creature {
 	private:
-		int c_x, c_y;
+		bool isStarved = false;
  		int fitness = 0;
-		int damage = 1;
-		int health = 1;
+		int damage = 0;
+		int health = 100;
 		int speed = 1;
+		int energy = 100;
 
 	public:
+		int c_x, c_y;
+
 		Creature();
 		Creature(int x, int y);
 		~Creature();
 
 		void showInfo();
+		void move(int dx, int dy);
 };
 
 #endif

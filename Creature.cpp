@@ -20,6 +20,14 @@ void Creature::showInfo() {
 	cout << "Damage: " << damage << endl;
 	cout << "Health: " << health << endl;
 	cout << "Speed: " << speed << endl;
+	cout << "Energy Level: " << energy << endl;
 
+}
+
+void Creature::move(int dx, int dy) {
+	c_x += dx;
+	c_y += dy;
+	cout << "Moving by (" << dx << "," << dy << ")" << endl;
+	energy -= 1;
 }
 

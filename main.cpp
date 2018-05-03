@@ -1,20 +1,28 @@
 #include "World.h"
 #include "Creature.h"
+#include <ctime>
+
+#define ITERATIONS  10
+
+using namespace std;
 
 int main() {
 
-    World world1;
-    //World world2(50, 100);
+	clock_t start;
+	double duration;
 
-    world1.populateFood();
-    //world2.populateFood();
+	World world(50, 50, 10);
+    
+	world.populateFood();
+	world.populateCreature();
 
-    world1.showWorld();
-	//world2.showWorld();
+    world.showWorld();
 
-	Creature c1;
-	Creature c2(2, 15);
+	for (int i = 0; i < ITERATIONS; i++) {
+		world.moveCreatures();
+		cout << "Iteration " << i << endl;
+		world.showWorld();
+	}
 
-	c1.showInfo();
-	c2.showInfo();
+
 }

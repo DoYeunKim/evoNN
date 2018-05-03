@@ -1,12 +1,14 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include<iostream>
-#include<cstdlib>
-#include<math.h>
-#include<vector>
+#include <iostream>
+#include <cstdlib>
+#include <math.h>
+#include <vector>
+#include "Creature.h"
 #define defaultSize 20
 #define defaultFood 10
+#define defaultPop 10
 
 using namespace std;
 
@@ -20,19 +22,25 @@ class  World {
 
     private:
 		enum {NIL, FOOD, CREATURE};
-        vector< vector<int> > map;
-        int size;
+        int mapSize;
         int amountFood;
-        vector<food> foods;
+		int popSize;
+        vector< vector<int> > map;
 
     public:
+        vector<food> foods;
+		vector<Creature> creatures;
         World();
-        World(int dim, int f);
+        World(int dim, int f, int c);
         ~World();
 
         void populateFood();
         void showWorld();
-        void showPos(int x, int y);
+
+		void populateCreature();
+        bool showPos(int x, int y);
+		void moveCreatures();
+		void updateMap();
 
 };
 

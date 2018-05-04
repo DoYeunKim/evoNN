@@ -37,6 +37,6 @@ void Creature::move(int dx, int dy) {
 	c_x += dx * speed;
 	c_y += dy * speed;
 	cout << "Moving by (" << dx << "," << dy << ")" << endl;
-	energy -= 1;
+	energy -= walkEnergy;
 }
 

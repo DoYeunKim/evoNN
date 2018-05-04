@@ -13,8 +13,8 @@ int main() {
 
 	int m,f,c;
 	m = 10;
-	f = 20;
-	c = 10;
+	f = 60;
+	c = 1;
 
 	// Check for illegal world
 	if (f < 1 || c < 1) {
@@ -34,9 +34,13 @@ int main() {
     world.showWorld();
 
 	for (int i = 0; i < ITERATIONS; i++) {
-		world.moveCreatures();
-		cout << "Iteration " << i << endl;
-		world.showWorld();
+		if (world.moveCreatures()) {
+			cout << "Iteration " << i << endl;
+			world.showWorld();
+		} else {
+			cout << "World terminated " << endl;
+			break;
+		}
 	}
 
 	return 0;

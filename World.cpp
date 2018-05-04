@@ -7,7 +7,7 @@ using namespace std;
 World::World() {
 	mapSize = DEFAULT_SIZE;
 	amountFood = DEFAULT_FOOD;
-	popSize = DEFAULT_POP;
+	popSize = survived = DEFAULT_POP;
 	cout << "Creating a world that is " << mapSize << " x " << mapSize << " in size" << endl;
 
 	for(int i = 0; i < mapSize; i++) {
@@ -20,8 +20,8 @@ World::World() {
 World::World(int dim, int f, int c) {
 	mapSize = dim;
 	amountFood = f;
-	popSize = c;
-
+	popSize = survived = c;
+	
 	cout << "Creating a world that is " << mapSize << " x " << mapSize << " in size" << endl;
 	
 	for(int i = 0; i < mapSize; i++) {
@@ -88,7 +88,7 @@ void World::populateCreature() {
 
 // Show the world so that we can know what is going on
 void World::showWorld() {
-	cout << endl << "Displaying a world that is " << mapSize << " x " << mapSize << " in size" << endl;
+	cout << "Displaying a world that is " << mapSize << " x " << mapSize << " in size" << endl;
 	for (int i = 0; i < mapSize; i++) {
 		for (int j = 0; j < mapSize; j++) {
 			cout << map[i][j] << " ";
@@ -154,16 +154,16 @@ int World::showPos(int x, int y){
 // For each creature, check if it can move to the new (x,y), and if it can, move
 // Right now the amount of movement is randomized
 // When the animal moves, update the map to be NIL - this part is not working....
-void World::moveCreatures() {
-	int dx, dy, x, y, n_x, n_y, surviving;
+bool World::moveCreatures() {
+	int dx, dy, x, y, n_x, n_y;
+	if (!survived) { return false; }
 
-	surviving = creatures.size();
-	
 	// Iterate through creatures
 	for (vector<Creature>::iterator it = creatures.begin(); it != creatures.end(); it++) {
 		//cout << "Was at (" << it->c_x << "," << it->c_y << ")" << endl;
 		if (it->isAlive) {
-		
+			
+			// Every turn, they use up 1 energy	
 			x = it->c_x;
 			y = it->c_y;
 			it->energy--;
@@ -175,17 +175,19 @@ void World::moveCreatures() {
 			}
 			// If the creature has been starving for 5 turns, then reduce its health
 			// If health reaches zero, then it is dead. update the map and break out of the loop
-			if (it->starving == 5) {
+			if (it->starving == STARVATION) {
 				it->health--;
 				if(it->health <= 0) { 
 					it->isAlive = false;
 					cout << "This one is dead" << endl;
-					surviving--;
+					survived--;
 					map[x][y] = NIL;		
 					continue; 
 				}
 			}
 
+			calcVision(x, y, it->vision);
+			
 			// Calculating dx and dy
 			// This will be provided by NN as I move along
 			dx = 1 - (rand() % 3);
@@ -208,19 +210,37 @@ void World::moveCreatures() {
 				//cout << "Moved Creature" << endl;
 				map[x][y] = NIL;
 				//cout << "Updated Map" << endl;
+
 			}
 			//cout << "Now at (" << it->c_x << "," << it->c_y << ")" << endl;
 			cout << "Current energy level is " << it->energy << endl;
 		}
 		
 	}
-	cout << surviving << " creatures survived this round" << endl;
-		
+	cout << survived << " creatures survived this round" << endl << endl << endl;
 
 	// Call populate food
 	// If the creatures ate something, food will be repopulated
 	// Else, nothing happens
 	// I will probably stagnate this as we may not want indefinite abundance of creatures
 	populateFood();
+	return true;
+}
+
+void World::calcVision(int x, int y, int v) {
+	cout << "Showing the creature's visual field" << endl;
+	vector<int> v_field;
+	cout << "Looking around (" << x << "," << y << ") in radius of " << v << endl;
+	for (int i = x - v; i <= x + v; i++) {
+		for (int j = y - v; j <= y + v; j++) {
+			if (i == x && j == y) { continue; }
+			if ( 0 > i || i >= mapSize || 0 > j || j >= mapSize) {
+				v_field.push_back(9);
+				
+			} else {
+				v_field.push_back(map[i][j]);
+			}
+		}
+	}
 }
 

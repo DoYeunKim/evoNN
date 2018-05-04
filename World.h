@@ -9,7 +9,8 @@
 #define DEFAULT_SIZE 20
 #define DEFAULT_FOOD 10
 #define DEFAULT_POP 10
-#define FOOD_ENERGY 4
+#define FOOD_ENERGY 5
+#define STARVATION 3
 
 using namespace std;
 
@@ -41,6 +42,7 @@ class  World {
         vector< vector<int> > map;
 
     public:
+		int survived;
 		// These vectors are constantly updated and it is easier to have them here
         vector<food> foods;
 		vector<Creature> creatures;
@@ -60,7 +62,9 @@ class  World {
 		// showPos checks if it is possible for the creature to move into that space
 		// moveCreatures calls Creature.move() to actually do the moving if showPos returns true
         int showPos(int x, int y);
-		void moveCreatures();
+		bool moveCreatures();
+		void calcVision(int x, int y, int v);
+		
 
 };
 

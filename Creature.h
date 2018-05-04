@@ -7,11 +7,8 @@
 // I will be adding multiple species that are inherited Creatures
 class Creature {
 	private:
-
 		int speed = 1;
-		// The area of visual field, n block radius of the animal (n = |dx| + |dy|)
-		int vision = 2;
-
+		int walkEnergy = 2;
 
 	public:
 		// position
@@ -37,8 +34,10 @@ class Creature {
 		// The speed at which the animal trasverses the world
 		// As of now, I'm not sure how I will use this, but it most likley will depend
 		// on the "species"
-
+		// The area of visual field, n block radius of the animal (n = |dx| + |dy|)
+		int vision = 2;
 		// Inits
+		
 		Creature();
 		Creature(int x, int y);
 		~Creature();

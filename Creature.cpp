@@ -1,21 +1,22 @@
-#include "Creature.h"
+#include "Creature.hpp"
 
 using namespace std;
 
 // By default, place the creature at (0,0)
 Creature::Creature() {
     c_x = c_y = 0;
+	NeuralNet NN();
 }
 
 // Place the creature at (x,y)
 Creature::Creature(int x, int y) {
     c_x = x;
     c_y = y;
+	NeuralNet NN();
 }
 
-// remove creature
-// Don't have dynamically allocated objects yet, but will become handy
 Creature::~Creature() {
+
 }
 
 // Show the relevant information

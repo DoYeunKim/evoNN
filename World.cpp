@@ -1,4 +1,4 @@
-#include "World.h"
+#include "World.hpp"
 #include <time.h>
 
 using namespace std;
@@ -88,7 +88,7 @@ void World::populateCreature() {
 
 // Show the world so that we can know what is going on
 void World::showWorld() {
-	cout << "Displaying a world that is " << mapSize << " x " << mapSize << " in size" << endl;
+
 	for (int i = 0; i < mapSize; i++) {
 		for (int j = 0; j < mapSize; j++) {
 			cout << map[i][j] << " ";
@@ -156,6 +156,7 @@ int World::showPos(int x, int y){
 // When the animal moves, update the map to be NIL - this part is not working....
 bool World::moveCreatures() {
 	int dx, dy, x, y, n_x, n_y;
+	bool foodEaten = false;
 	if (!survived) { return false; }
 
 	// Iterate through creatures
@@ -186,8 +187,15 @@ bool World::moveCreatures() {
 				}
 			}
 
-			calcVision(x, y, it->vision);
-			
+			it->fitness++;
+			it->visible = calcVision(x, y, it->vision);
+			/*
+			for (vector<double>::iterator i = it->visible.begin(); i != it->visible.end(); i++) {
+				cout << *i << " " ;
+			}
+			cout << endl;
+			*/
+
 			// Calculating dx and dy
 			// This will be provided by NN as I move along
 			dx = 1 - (rand() % 3);
@@ -201,6 +209,7 @@ bool World::moveCreatures() {
 			int result = showPos(n_x, n_y);
 			if(result > -1) {
 				if (result == FOOD) { 
+					foodEaten = true;
 					it->starving == 0;
 					it->energy += FOOD_ENERGY;
 				}
@@ -223,24 +232,34 @@ bool World::moveCreatures() {
 	// If the creatures ate something, food will be repopulated
 	// Else, nothing happens
 	// I will probably stagnate this as we may not want indefinite abundance of creatures
-	populateFood();
+	if (foodEaten) {
+		populateFood();
+	}
 	return true;
 }
 
-void World::calcVision(int x, int y, int v) {
-	cout << "Showing the creature's visual field" << endl;
-	vector<int> v_field;
-	cout << "Looking around (" << x << "," << y << ") in radius of " << v << endl;
+// Calculate the visual field of the creature at the given location
+vector<double> World::calcVision(int x, int y, int v) {
+	// cout << "Showing the creature's visual field" << endl;
+	vector<double> v_field;
+	// cout << "Looking around (" << x << "," << y << ") in radius of " << v << endl;
+	// Within the visual range
 	for (int i = x - v; i <= x + v; i++) {
 		for (int j = y - v; j <= y + v; j++) {
+			// Skip the creature's location
 			if (i == x && j == y) { continue; }
+			// If out of bounds, put 9 down
 			if ( 0 > i || i >= mapSize || 0 > j || j >= mapSize) {
-				v_field.push_back(9);
-				
+				v_field.push_back(0);
+				// cout << "0 ";
 			} else {
-				v_field.push_back(map[i][j]);
+				double converted = (double) (map[i][j] + 1)/4;
+				// cout << converted << " ";
+				v_field.push_back(converted);
 			}
 		}
 	}
-}
+	cout << endl;
+	return v_field;	
+}	
 

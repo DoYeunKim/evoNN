@@ -1,7 +1,8 @@
-#ifndef CREATURE_H
-#define CREATURE_H
+#ifndef CREATURE_HPP
+#define CREATURE_HPP
 
-#include<iostream>
+#include <iostream>
+#include "NeuralNet.hpp"
 
 // The main class of Creature
 // I will be adding multiple species that are inherited Creatures
@@ -36,8 +37,12 @@ class Creature {
 		// on the "species"
 		// The area of visual field, n block radius of the animal (n = |dx| + |dy|)
 		int vision = 2;
+
+		vector<double> visible;
+
+		NeuralNet NN;
+
 		// Inits
-		
 		Creature();
 		Creature(int x, int y);
 		~Creature();

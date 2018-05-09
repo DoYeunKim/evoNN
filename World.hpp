@@ -1,15 +1,15 @@
-#ifndef WORLD_H
-#define WORLD_H
+#ifndef WORLD_HPP
+#define WORLD_HPP
 
 #include <iostream>
 #include <cstdlib>
 #include <math.h>
 #include <vector>
-#include "Creature.h"
+#include "Creature.hpp"
 #define DEFAULT_SIZE 20
 #define DEFAULT_FOOD 10
 #define DEFAULT_POP 10
-#define FOOD_ENERGY 5
+#define FOOD_ENERGY 10
 #define STARVATION 3
 
 using namespace std;
@@ -29,6 +29,7 @@ class  World {
     private:
 		// enum for switch function
 		enum {NIL, FOOD, CREATURE};
+		enum {N, NE, E, SE, S, SW, W, NW, P};
 		// The width or height of the map
         int mapSize;
 		// The maximum amount of food that we want on the world
@@ -63,8 +64,7 @@ class  World {
 		// moveCreatures calls Creature.move() to actually do the moving if showPos returns true
         int showPos(int x, int y);
 		bool moveCreatures();
-		void calcVision(int x, int y, int v);
-		
+		vector<double> calcVision(int x, int y, int v);
 
 };
 

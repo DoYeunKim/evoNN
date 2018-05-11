@@ -1,13 +1,17 @@
 #include <string>
 #include <sstream> // istringstream
 #include <fstream> // ifstream
+#include <unistd.h> // opterr
 #include "World.hpp"
 //#include <ctime>
 
 #define EPOCHS 100
 #define GENERATIONS 50
+#define MIN_SUS 0.0
+#define MAX_SUS 50.0
 
 using namespace std;
+
 
 // Function to read in the map, given the name of the csv file
 vector< vector<double> > readMap(string inputName) {
@@ -66,45 +70,81 @@ void usage (char* program) {
 	cout << program << " usage: " << endl;
 	string usage;
 	
-	usage = "\n\tOptional:"
+	usage = "\n\t{filename}: The map to load"	
+		"\n\tOptional:"
 			"\n\t-c {number of creatures}: The number of creatures per generation (default = 1)"
-			"\n\t-e {epochs}: The number of epochs per generation (default = " + to_string(EPOCH) + ")"
+			"\n\t-e {epochs}: The number of epochs per generation (default = " + to_string(EPOCHS) + ")"
 			"\n\t-g {generations}: The number of generations of creatures (default = " + to_string(GENERATIONS) + ")"
 			"\n\t-l {learning rate}: Learning rate for weight adjustment (default = 0.5)"
 			"\n\t-m {minimum sustainability}: The minimum sustainability score possible for each tile (default = 0.0)"
 			"\n\t-M {maximum sustainability}: The maximum sustainability score possible for each tile (default = 50.0)"
 			"\n\t-s {shift}: Shift in node activation function (default = 0.3)"
 			"\n\t-w {weights}: Initial range of connection strength (default = 0.15)"
-			"\n\n\t Example: ./evoNN -c 10 -e 50 -g 50 -l 0.9 -m 0.0 -M 20.0 \n";
+			"\n\n\t Example: ./evoNN  10x10_0x50.csv -c 10 -e 50 -g 50 -l 0.9 -m 0.0 -M 20.0 \n";
 
 	cout << usage << endl;
 	exit(1);
 }
 
-void getArgs(int argc, char** argv, double& learningRate, int& epoch){
-	learningRate = epoch = -1;
+void getArgs(int argc, char** argv, string& input, int& numCreature, int& epochs, int& generations, double& learningRate, double& minS, double& maxS, double& shift, double& weight) {
+	learningRate = epochs = -1;
 	
 	opterr = 1;
 	char c;
-	
+
+	input = argv[1];
+
 	while ((c = getopt(argc, argv, "c:e:l:m:M:s:w:g")) >= 0) {
 		switch(c) {
+			case 'c':
+				numCreature = atoi(optarg);
+				break;	
 			case 'e':
-				epoch = atoi(optarg);
+				epochs = atoi(optarg);
 				break;
+			case 'g':
+				generations = atoi(optarg);
+				break;	
 			case 'l':
 				learningRate = atof(optarg);
 				break;
+			case 'm':
+				minS = atof(optarg);
+				break;
+			case 'M':
+				maxS = atof(optarg);
+				break;
+			case 's':
+				shift = atof(optarg);
+				break;
+			case 'w':	
+				weight = atof(optarg);
+				break;
+			case '?':
+				usage(argv[0]);
+				break;
+			default:
+				exit(1);	
 		}
 	}
 }
 
 
 int main(int argc, char** argv) {
-	double learningRate;
-	int epochs;
 
-
+	int epochs = EPOCHS;
+	int numCreature = DEFAULT_POP;
+	int generations = GENERATIONS;
+	double learningRate = DEF_LRATE;
+	double minS = MIN_SUS;
+	double maxS = MAX_SUS;
+	double shift = SHIFT_DEFAULT;
+	double weight = EDGE_INIT;
+	string input;
+	
+	if (argc == 1) usage(argv[0]);
+		
+	getArgs(argc, argv, input, numCreature, epochs, generations, learningRate, minS, maxS, shift, weight);
 	// clock_t start;
 	// double duration;
 	

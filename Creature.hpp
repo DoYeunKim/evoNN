@@ -3,6 +3,11 @@
 
 #include <iostream>
 #include "NeuralNet.hpp"
+#include "shared.hpp"
+
+#define ENERGY_INTAKE 5
+#define CONSUME_PER_CREATURE 0.01
+#define STARVATION 3
 
 // The main class of Creature
 // I will be adding multiple species that are inherited Creatures
@@ -12,6 +17,10 @@ class Creature {
 		int walkEnergy = 2;
 
 	public:
+		// enum for switch function
+		// The first 8 represent cardinal directions
+		// P is for the present location (i.e. does not move)
+		enum {N, NE, E, SE, S, SW, W, NW, P};
 		// position
 		int c_x, c_y;
 		// The level of energy.
@@ -24,10 +33,7 @@ class Creature {
 		int starving = 0;
 		// Fitness score for future GA
 		// Fitness = iterations survived + food eaten + end health
- 		int fitness = 0;
-		// Damage the animal can deal to others
-		// This will mostly be used by omnivores and carnivores
-		int damage = 0;
+ 		double fitness = 0;
 		// How healthy the animal is
 		// Whenever it is hurt or has been starving, it will be lowered
 		// and if health <= 0, then it dies 
@@ -50,7 +56,7 @@ class Creature {
 		// Show the relevant informations on the creature
 		void showInfo();
 		// Move the creture by dx and dy
-		void move(int dx, int dy);
+		void move(int direction);
 };
 
 #endif

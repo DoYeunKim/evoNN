@@ -4,14 +4,11 @@
 #include <unistd.h> // opterr
 #include "World.hpp"
 //#include <ctime>
-
 #define EPOCHS 100
 #define GENERATIONS 50
-#define MIN_SUS 0.0
-#define MAX_SUS 50.0
+
 
 using namespace std;
-
 
 // Function to read in the map, given the name of the csv file
 vector< vector<double> > readMap(string inputName) {
@@ -76,8 +73,8 @@ void usage (char* program) {
 			"\n\t-e {epochs}: The number of epochs per generation (default = " + to_string(EPOCHS) + ")"
 			"\n\t-g {generations}: The number of generations of creatures (default = " + to_string(GENERATIONS) + ")"
 			"\n\t-l {learning rate}: Learning rate for weight adjustment (default = 0.5)"
-			"\n\t-m {minimum sustainability}: The minimum sustainability score possible for each tile (default = 0.0)"
-			"\n\t-M {maximum sustainability}: The maximum sustainability score possible for each tile (default = 50.0)"
+			"\n\t-m {minimum sustainability}: The minimum sustainability score possible for each tile (default = 0.0, [0.0,1.0) )"
+			"\n\t-M {maximum sustainability}: The maximum sustainability score possible for each tile (default = 1.0, (0.0,1.0] )"
 			"\n\t-s {shift}: Shift in node activation function (default = 0.3)"
 			"\n\t-w {weights}: Initial range of connection strength (default = 0.15)"
 			"\n\n\t Example: ./evoNN  10x10_0x50.csv -c 10 -e 50 -g 50 -l 0.9 -m 0.0 -M 20.0 \n";
@@ -86,6 +83,8 @@ void usage (char* program) {
 	exit(1);
 }
 
+// Parse arguments.
+// As of now, only the file name is necessary.
 void getArgs(int argc, char** argv, string& input, int& numCreature, int& epochs, int& generations, double& learningRate, double& minS, double& maxS, double& shift, double& weight) {
 	learningRate = epochs = -1;
 	
@@ -109,11 +108,21 @@ void getArgs(int argc, char** argv, string& input, int& numCreature, int& epochs
 				learningRate = atof(optarg);
 				break;
 			case 'm':
-				minS = atof(optarg);
-				break;
+				if (atof(optarg) >= 1.0 || atof(optarg) < 0.0) {
+					usage(argv[0]);
+					break;
+				} else {
+					minS = atof(optarg);
+					break;
+				}
 			case 'M':
-				maxS = atof(optarg);
-				break;
+				if (atof(optarg) <= 0.0 || atof(optarg) > 1.0) {
+					usage(argv[0]);
+					break;
+				} else {
+					maxS = atof(optarg);
+					break;
+				}
 			case 's':
 				shift = atof(optarg);
 				break;
@@ -148,7 +157,7 @@ int main(int argc, char** argv) {
 	// clock_t start;
 	// double duration;
 	
-	vector< vector<double> > inputMap = readMap("10x10_0x50.csv");
+	vector< vector<double> > inputMap = readMap(input);
 
 	// Output the inital map
 	for (auto l: inputMap) {
@@ -158,30 +167,14 @@ int main(int argc, char** argv) {
 		cout << endl;
 	}
 
-	/*
-	int m,f,c;
-	m = 10;
-	f = 30;
-	c = 1;
-
-	// Check for illegal world
-	if (f < 1 || c < 1) {
-		cout << "We need at least one food and one creature to work with." << endl;
-		return -1;
-	}
-	else if ((m * m) < (f + c)) {
-		cout << "The sum of food and creatures cannot exceed the amount of space provided in this world." << endl;
-		return -1;
-	} 
-
-	World world(m, f, c);
+	World world(inputMap);
     
-	world.populateFood();
-	world.populateCreature();
-
+	/*
 	cout << "Displaying a world that is " << m << " x " << m << " in size" << endl;
     world.showWorld();
+	*/
 
+	/*
 	for (int i = 0; i < ITERATIONS; i++) {
 		if (world.moveCreatures()) {
 			cout << "Iteration " << i << endl;

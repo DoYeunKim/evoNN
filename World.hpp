@@ -6,20 +6,21 @@
 #include <math.h>
 #include <vector>
 #include "Creature.hpp"
-#define DEFAULT_SIZE 20
-#define DEFAULT_FOOD 10
-#define DEFAULT_POP 10
-#define FOOD_ENERGY 10
-#define STARVATION 3
+
+#define MIN_SUS 0.0
+#define MAX_SUS 50.0
+#define DEFAULT_POP 1
+
 
 using namespace std;
 
 // Each food is a struct
 // with x and y coordinate
-typedef struct _food {
-    int f_x, f_y;
+typedef struct _cell {
+    int cellPop;
+	double nourishment;
 
-} food;
+} cell;
 
 // The world!
 // This is the main class of the program
@@ -28,31 +29,29 @@ class  World {
 
     private:
 		// enum for switch function
-		enum {NIL, FOOD, CREATURE};
+		// The first 8 represent cardinal directions
+		// P is for the present location (i.e. does not move)
 		enum {N, NE, E, SE, S, SW, W, NW, P};
-		// The width or height of the map
-        int mapSize;
-		// The maximum amount of food that we want on the world
-        int amountFood;
+		// The width and height of the map
+        int mapX, mapY;
 		// The maximum amount of creatures that we want on the world
 		int popSize;
 		// The map
-		// It is a vector of vector of int so that it is easier to use enum for the time being
-		// I may want to change this to char type to make the world more light
-		// Also wondering if I should make map a public variable so that it can be updated more easily
-        vector< vector<int> > map;
+		// The current map comprises of cells that contain nourishment score and the number of
+		// creatures currently there. 
+        vector< vector<cell> > map;
 
     public:
 		int survived;
 		// These vectors are constantly updated and it is easier to have them here
-        vector<food> foods;
 		vector<Creature> creatures;
 		//inits
         World();
-        World(int dim, int f, int c);
+        World(vector< vector<double> >& inputMap);
         ~World();
 
 		// Populate the world
+		void initWorld(vector< vector<double> >& i_map);
         void populateFood();
 		void populateCreature();
 	
@@ -62,7 +61,7 @@ class  World {
 		// Functions dealing with moving the creatures
 		// showPos checks if it is possible for the creature to move into that space
 		// moveCreatures calls Creature.move() to actually do the moving if showPos returns true
-        int showPos(int x, int y);
+        bool showPos(int x, int y);
 		bool moveCreatures();
 		vector<double> calcVision(int x, int y, int v);
 

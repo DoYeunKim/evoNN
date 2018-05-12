@@ -24,7 +24,7 @@ class NeuralNet {
 		enum {N, NE, E, SE, S, SW, W, NW, P};
 		double lRate;
 		vector<int> inputSums;
-		vector<double> inputLayer;
+
 		vector<double> outputLayer;
 		vector<double> weightSums;
 		vector<edge> edges;
@@ -36,8 +36,11 @@ class NeuralNet {
 		NeuralNet(vector<edge> inheritedE, double learningRate);
 		~NeuralNet();
 
+		double testInput();
+		void trainWeights();
 		void initOutput();
 		void setEdges(int input);
+		vector<double> inputLayer;
 };
 
 

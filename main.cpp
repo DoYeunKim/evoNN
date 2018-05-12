@@ -159,6 +159,7 @@ int main(int argc, char** argv) {
 	
 	vector< vector<double> > inputMap = readMap(input);
 
+	/*	
 	// Output the inital map
 	for (auto l: inputMap) {
 		for (auto x : l) {
@@ -166,16 +167,14 @@ int main(int argc, char** argv) {
 		}
 		cout << endl;
 	}
+	*/
 
 	World world(inputMap);
     
-	/*
-	cout << "Displaying a world that is " << m << " x " << m << " in size" << endl;
     world.showWorld();
-	*/
 
-	/*
-	for (int i = 0; i < ITERATIONS; i++) {
+	for (int i = 0; i < 10; i++) {
+	
 		if (world.moveCreatures()) {
 			cout << "Iteration " << i << endl;
 			world.showWorld();
@@ -184,7 +183,6 @@ int main(int argc, char** argv) {
 			break;
 		}
 	}
-	*/
 
 	return 0;
 

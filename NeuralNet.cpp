@@ -46,6 +46,14 @@ NeuralNet::~NeuralNet() {
 
 };
 
+void NeuralNet::trainWeights() {
+
+}
+
+double NeuralNet::testInput() {
+
+}
+
 // Set the edges
 void NeuralNet::setEdges(int input) {
 	// Clear the edges 

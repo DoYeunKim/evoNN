@@ -6,8 +6,8 @@
 #include "shared.hpp"
 
 #define ENERGY_INTAKE 5
-#define CONSUME_PER_CREATURE 0.01
-#define STARVATION 3
+#define CONSUME_PER_CREATURE 0.2
+#define STARVATION 5
 
 // The main class of Creature
 // I will be adding multiple species that are inherited Creatures
@@ -43,8 +43,6 @@ class Creature {
 		// on the "species"
 		// The area of visual field, n block radius of the animal (n = |dx| + |dy|)
 		int vision = 2;
-
-		vector<double> visible;
 
 		NeuralNet NN;
 

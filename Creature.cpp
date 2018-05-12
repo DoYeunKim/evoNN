@@ -12,7 +12,9 @@ Creature::Creature() {
 Creature::Creature(int x, int y) {
     c_x = x;
     c_y = y;
-	NeuralNet NN();
+	int visInput = (4 * vision) * (vision + 1);
+	// cout << "The size of input layer is: " << visInput << endl;
+	NeuralNet NN(visInput);
 }
 
 Creature::~Creature() {
@@ -35,14 +37,13 @@ void Creature::showInfo() {
 // Reduce energy level
 void Creature::move(int dir) {
 	int d = dir;
-	int dx, dy;
 
 	displace dis;
 	dis = cardinalToDisplace(d);
 
 	c_x += (dis.dx) * speed;
 	c_y += (dis.dy) * speed;
-	cout << "Moving by (" << dx << "," << dy << ")" << endl;
+	cout << "Moving by (" << dis.dy << "," << dis.dx << ")" << endl;
 	energy -= walkEnergy;
 }
 

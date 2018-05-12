@@ -1,19 +1,19 @@
 #include "World.hpp"
-#include <time.h>
+
 
 using namespace std;
 
 void World::initWorld(vector< vector<double> >& i_map) {
-	mapX = i_map.size();
-	if (mapX <= 0) { 
+	mapY = i_map.size();
+	if (mapY <= 0) { 
 		cout << "Illegal number of rows for the map ( <= 0)" << endl;
 		exit(1);
 	}
-	mapY = i_map[0].size();
+	mapX = i_map[0].size();
 
-	for (int i = 0; i < mapX; i++) {
+	for (int i = 0; i < mapY; i++) {
 		vector<cell> col;
-		for (int j = 0; j < mapY; j++) {
+		for (int j = 0; j < mapX; j++) {
 			cell *c = new cell;
 			c->cellPop = 0;
 			c->nourishment = i_map[i][j];
@@ -36,6 +36,7 @@ World::World(vector< vector<double> >& inputMap) {
 	popSize = survived = DEFAULT_POP;	
 	initWorld(inputMap);
 	cout << "Creating a world that is " << mapX << " x " << mapY << " in size" << endl;
+	populateCreature();
 }
 
 // Delete map
@@ -61,11 +62,11 @@ void World::populateCreature() {
 		
 		// Create new creature and place it.
 		// Update the total number of creatures in the cell
-		Creature c;
-		c.c_x = x;
-		c.c_y = y;
+		Creature c(x,y);
+		//c.c_x = x;
+		//c.c_y = y;
 		creatures.push_back(c);
-		map[x][y].cellPop++;
+		map[y][x].cellPop++;
 		//cout << "(" << x << "," << y << ")" << endl;
 		currNum++;
 	}
@@ -78,13 +79,16 @@ void World::populateCreature() {
 
 // Show the world so that we can know what is going on
 void World::showWorld() {
-
-	for (int i = 0; i < mapX; i++) {
-		for (int j = 0; j < mapY; j++) {
-			cout << map[i][j].nourishment << " ";
+	cout << "---------------------------------------------------------------------------------" << endl;
+	for (int i = 0; i < mapY; i++) {
+		cout << "|";
+		for (int j = 0; j < mapX; j++) {
+			printf("%2d, %1.1lf|", map[j][i].cellPop, map[j][i].nourishment);
+			// printf("%2.2lf ", map[j][i].nourishment);
 		}
 		cout << endl;
 	}
+	cout << "---------------------------------------------------------------------------------" << endl;
 	cout << endl;
 }
 
@@ -119,18 +123,31 @@ bool World::moveCreatures() {
 	// Iterate through creatures
 	for (vector<Creature>::iterator it = creatures.begin(); it != creatures.end(); it++) {
 		//cout << "Was at (" << it->c_x << "," << it->c_y << ")" << endl;
-		if (it->isAlive) {
-			
+		if (it->isAlive) {				
+	
 			// Every turn, they use up 1 energy	
 			x = it->c_x;
 			y = it->c_y;
 			it->energy--;
+			double currN = map[y][x].nourishment;
+			if (currN >= CONSUME_PER_CREATURE) {
+				map[y][x].nourishment -= CONSUME_PER_CREATURE;
+				it->energy += ENERGY_INTAKE;
+				it->fitness += currN;
+				it->starving = 0;
+			} else if (currN > 0) {
+				map[y][x].nourishment = 0;
+				it->energy += ENERGY_INTAKE * (currN/CONSUME_PER_CREATURE);
+				it->fitness += currN;
+				it->starving = 0;
+			}
 		
 			// If the creature has run out of energy, it is starving
 			if (it->energy <= 0) {
 				it->starving++;
 				cout << "Starving... " << it->starving << endl;
 			}
+
 			// If the creature has been starving for 5 turns, then reduce its health
 			// If health reaches zero, then it is dead. update the map and break out of the loop
 			if (it->starving == STARVATION) {
@@ -139,23 +156,27 @@ bool World::moveCreatures() {
 					it->isAlive = false;
 					cout << "This one is dead" << endl;
 					survived--;
-					map[x][y].cellPop--;		
+					map[y][x].cellPop--;		
 					continue; 
 				}
 			}
 
-			it->fitness += map[x][y].nourishment;
-			it->visible = calcVision(x, y, it->vision);
+			it->fitness += map[y][x].nourishment;
+			it->NN.inputLayer = calcVision(x, y, it->vision);
+
 			/*
-			for (vector<double>::iterator i = it->visible.begin(); i != it->visible.end(); i++) {
-				cout << *i << " " ;
-			}
-			cout << endl;
+			int k = 0;
+			for (auto l : it->NN.inputLayer) {
+				if (k == 12) cout << " p  ";
+				printf("%1.1lf ", l);
+				k++;
+			} cout << endl;
 			*/
 
 			// Calculating dx and dy
 			// This will be provided by NN as I move along
 			dir = rand() % 9;
+			// cout << dir << endl;
 			displace dis;
 			dis = cardinalToDisplace(dir);
 
@@ -165,11 +186,9 @@ bool World::moveCreatures() {
 			// If the animal can move, the move
 			if (showPos(n_x, n_y)) {
 				it->move(dir);
+				map[y][x].cellPop--;
+				map[n_y][n_x].cellPop++;
 			}
-
-			//cout << "The Creature is moving" << endl;
-			//cout << "Moved Creature" << endl;
-			//cout << "Updated Map" << endl;
 
 			//cout << "Now at (" << it->c_x << "," << it->c_y << ")" << endl;
 			cout << "Current energy level is " << it->energy << endl;
@@ -197,15 +216,20 @@ vector<double> World::calcVision(int x, int y, int v) {
 	for (int i = x - v; i <= x + v; i++) {
 		for (int j = y - v; j <= y + v; j++) {
 			// Skip the creature's location
-			if (i == x && j == y) { continue; }
+			if (i == x && j == y) { 
+				cout << " P  ";
+				continue; 
+			}
 			// If out of bounds, put 9 down
 			if ( 0 > i || i >= mapX || 0 > j || j >= mapY) {
-				v_field.push_back(-1);
-				// cout << "0 ";
+				v_field.push_back(-1.0);
+				cout << "-1. ";
 			} else {
-				v_field.push_back(map[i][j].nourishment);
+				v_field.push_back(map[j][i].nourishment);
+				printf("%1.1lf ", map[j][i].nourishment);
 			}
 		}
+		cout << endl;
 	}
 	cout << endl;
 	return v_field;	

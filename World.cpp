@@ -46,6 +46,15 @@ World::~World() {
 // Populate the world with food
 // Until the quota of food is met, populate the map, checking for collision
 void World::populateFood() {
+	for (auto i : map) {
+		for (auto j : i) {
+			if ((j.nourishment + DEF_REGEN) > 1.0 ) {
+				j.nourishment = 1.0;
+			} else {
+				j.nourishment += DEF_REGEN;
+			}
+		}
+	}	
 }
 
 // Populate the world with creatures
@@ -54,17 +63,17 @@ void World::populateCreature() {
 	int x, y;
 	int currNum = creatures.size();
 	// Until the quota is met
+	srand(time(NULL));
 	while (currNum != popSize) {
 		// Random seed
-		srand(time(NULL));
 		x = rand() % mapX;
 		y = rand() % mapY;
-		
+		cout << "Creature " << currNum << " placed at (" << x << "," << y << ")" << endl;	
+
+	
 		// Create new creature and place it.
 		// Update the total number of creatures in the cell
 		Creature c(x,y);
-		//c.c_x = x;
-		//c.c_y = y;
 		creatures.push_back(c);
 		map[y][x].cellPop++;
 		//cout << "(" << x << "," << y << ")" << endl;
@@ -124,22 +133,32 @@ bool World::moveCreatures() {
 	for (vector<Creature>::iterator it = creatures.begin(); it != creatures.end(); it++) {
 		//cout << "Was at (" << it->c_x << "," << it->c_y << ")" << endl;
 		if (it->isAlive) {				
-	
+				
 			// Every turn, they use up 1 energy	
 			x = it->c_x;
 			y = it->c_y;
 			it->energy--;
+			int eaten = 0;
 			double currN = map[y][x].nourishment;
+			cout << "Found: " << currN << endl;
 			if (currN >= CONSUME_PER_CREATURE) {
 				map[y][x].nourishment -= CONSUME_PER_CREATURE;
-				it->energy += ENERGY_INTAKE;
+				eaten = ENERGY_INTAKE;
+				it->energy += eaten;
 				it->fitness += currN;
 				it->starving = 0;
+
 			} else if (currN > 0) {
 				map[y][x].nourishment = 0;
-				it->energy += ENERGY_INTAKE * (currN/CONSUME_PER_CREATURE);
+				eaten = ENERGY_INTAKE * (currN / CONSUME_PER_CREATURE);
+				it->energy += eaten;
 				it->fitness += currN;
 				it->starving = 0;
+			} else {
+				// Penalize not moving when there is lack of food
+				eaten = NO_FOOD;
+				it->energy += eaten;
+				cout << "No food here!" << endl;
 			}
 		
 			// If the creature has run out of energy, it is starving
@@ -154,29 +173,24 @@ bool World::moveCreatures() {
 				it->health--;
 				if(it->health <= 0) { 
 					it->isAlive = false;
-					cout << "This one is dead" << endl;
+					cout << "Creature died" << endl;
 					survived--;
 					map[y][x].cellPop--;		
+					cout << "The final fitness of this animal is: " << it-> fitness << endl;
 					continue; 
 				}
 			}
 
 			it->fitness += map[y][x].nourishment;
-			it->NN.inputLayer = calcVision(x, y, it->vision);
-
-			/*
-			int k = 0;
-			for (auto l : it->NN.inputLayer) {
-				if (k == 12) cout << " p  ";
-				printf("%1.1lf ", l);
-				k++;
-			} cout << endl;
-			*/
+			cout << "The current fitness of this animal is: " << it-> fitness << endl;
+			//it->NN.inputLayer = calcVision(x, y, it->vision);
 
 			// Calculating dx and dy
 			// This will be provided by NN as I move along
-			dir = rand() % 9;
-			// cout << dir << endl;
+			vector<double> calculatedV = calcVision(x, y, it->vision);
+			dir = it->NN.testInput(calculatedV);
+			// cout << "Moving to the cardinal direction of: " << dir << endl;
+			
 			displace dis;
 			dis = cardinalToDisplace(dir);
 
@@ -189,6 +203,8 @@ bool World::moveCreatures() {
 				map[y][x].cellPop--;
 				map[n_y][n_x].cellPop++;
 			}
+
+			it->NN.trainWeights(calculatedV);
 
 			//cout << "Now at (" << it->c_x << "," << it->c_y << ")" << endl;
 			cout << "Current energy level is " << it->energy << endl;
@@ -215,21 +231,16 @@ vector<double> World::calcVision(int x, int y, int v) {
 	// Within the visual range
 	for (int i = x - v; i <= x + v; i++) {
 		for (int j = y - v; j <= y + v; j++) {
-			// Skip the creature's location
-			if (i == x && j == y) { 
-				cout << " P  ";
-				continue; 
-			}
 			// If out of bounds, put 9 down
 			if ( 0 > i || i >= mapX || 0 > j || j >= mapY) {
-				v_field.push_back(-1.0);
-				cout << "-1. ";
+				v_field.push_back(0.0);
+				// cout << "-1. ";
 			} else {
 				v_field.push_back(map[j][i].nourishment);
-				printf("%1.1lf ", map[j][i].nourishment);
+				// printf("%1.1lf ", map[j][i].nourishment);
 			}
 		}
-		cout << endl;
+		// cout << endl;
 	}
 	cout << endl;
 	return v_field;	

@@ -173,7 +173,7 @@ int main(int argc, char** argv) {
     
     world.showWorld();
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < EPOCHS; i++) {
 	
 		if (world.moveCreatures()) {
 			cout << "Iteration " << i << endl;
@@ -182,6 +182,13 @@ int main(int argc, char** argv) {
 			cout << "World terminated " << endl;
 			break;
 		}
+	}
+
+	int ind = 0;
+	for (auto l : world.creatures) {
+		
+		cout << "Final fitness score of creature #" << ind << ": " << l.fitness << endl;
+		ind++;
 	}
 
 	return 0;

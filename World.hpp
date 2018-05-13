@@ -8,8 +8,9 @@
 #include "Creature.hpp"
 
 #define MIN_SUS 0.0
-#define MAX_SUS 50.0
-#define DEFAULT_POP 1
+#define MAX_SUS 1.0
+#define DEFAULT_POP 10
+#define DEF_REGEN 0.005
 
 
 using namespace std;

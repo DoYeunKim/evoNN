@@ -5,9 +5,10 @@
 #include "NeuralNet.hpp"
 #include "shared.hpp"
 
-#define ENERGY_INTAKE 5
-#define CONSUME_PER_CREATURE 0.2
+#define ENERGY_INTAKE 3
+#define CONSUME_PER_CREATURE 0.01
 #define STARVATION 5
+#define NO_FOOD -5
 
 // The main class of Creature
 // I will be adding multiple species that are inherited Creatures

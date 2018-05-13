@@ -46,12 +46,82 @@ NeuralNet::~NeuralNet() {
 
 };
 
-void NeuralNet::trainWeights() {
+// Train the weight of each edge using the evaluation
+void NeuralNet::trainWeights(vector<double> input) {
+	vector<double> eval = evalMovement(input);
 
+	int numEdge = edges.size();
+	edge curr;
+	for (int i = 0; i < numEdge; i++) {
+		curr = edges[i];
+		edges[i].weight = curr.weight + (lRate * inputLayer[curr.input] * eval[curr.output] * derivAF(weightSums[curr.output]));
+	}
+	
 }
 
-double NeuralNet::testInput() {
+vector<double> NeuralNet::evalMovement(vector<double> input) {
+	vector<double> eval(OUT_SIZE, 0);
 
+	// Obtain the mean value of the visible field
+	double max = -1;
+	double sum = 0;
+	for (auto mov : input) {
+		if (mov > max) {
+			max = mov;
+		};
+		sum += mov;
+	}
+
+	double mean = sum / OUT_SIZE;
+	double standard = max - mean;
+	for (int i = 0; i < OUT_SIZE; i++) {
+		eval[i] = input[i] - standard;
+		// cout << "Evaluation for tile " << i << ": " << eval[i] << endl;
+	}
+
+	return eval;
+}
+
+double NeuralNet::testInput(vector<double> input) {
+	// Read in the input layer
+	inputLayer.clear();
+	inputLayer = input;
+
+	// Add Bias node
+	inputLayer.push_back(BIAS);
+	
+	// Need to calculate weights for each edge
+	int numEdges = edges.size();
+
+	// Clear and resize weightSums
+	weightSums.clear();
+	weightSums.resize(OUT_SIZE, 0);
+
+	// Get sum of all inputs and wieghts for each output node
+	for (int i = 0; i < numEdges; i++) {
+		edge e = edges[i];
+		double input = inputLayer[e.input];
+		weightSums[e.output] += input * e.weight;
+	}
+
+	// Calculate output node value based on inputs and edge weights through activation function
+	for (int i = 0; i < OUT_SIZE; i++) {
+		outputLayer[i] = activationFunction(weightSums[i]);
+		// cout << "Output value for node " << i << ": " << outputLayer[i] << endl;
+	}
+
+	// Return the most activated output node
+	double max = 0;
+	int maxIndex = -1;
+
+	for (int i = 0; i < OUT_SIZE; i++) {
+		if (outputLayer[i] > max) {
+			max = outputLayer[i];
+			maxIndex = i;
+		}
+	}
+	// cout << "Moving by the cardinal direction of: " << maxIndex << endl;
+	return maxIndex;
 }
 
 // Set the edges

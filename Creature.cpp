@@ -44,6 +44,8 @@ void Creature::move(int dir) {
 	c_x += (dis.dx) * speed;
 	c_y += (dis.dy) * speed;
 	cout << "Moving by (" << dis.dy << "," << dis.dx << ")" << endl;
-	energy -= walkEnergy;
+	if (dis.dx + dis.dy > 0) {
+		energy -= walkEnergy;
+	}
 }
 

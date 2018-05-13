@@ -36,8 +36,9 @@ class NeuralNet {
 		NeuralNet(vector<edge> inheritedE, double learningRate);
 		~NeuralNet();
 
-		double testInput();
-		void trainWeights();
+		vector<double> evalMovement(vector<double> input);
+		double testInput(vector<double> input);
+		void trainWeights(vector<double> input);
 		void initOutput();
 		void setEdges(int input);
 		vector<double> inputLayer;

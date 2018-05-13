@@ -17,6 +17,13 @@ Creature::Creature(int x, int y) {
 	NeuralNet NN(visInput);
 }
 
+Creature::Creature(int x, int y, vector<edge>& inheritedE) {
+	c_x = x;
+	c_y = y;
+	vector<edge> e = inheritedE;
+	NeuralNet NN(inheritedE);
+}
+
 Creature::~Creature() {
 
 }

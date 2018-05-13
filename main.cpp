@@ -159,38 +159,60 @@ int main(int argc, char** argv) {
 	
 	vector< vector<double> > inputMap = readMap(input);
 
-	/*	
-	// Output the inital map
-	for (auto l: inputMap) {
-		for (auto x : l) {
-			printf("%2.2lf ", x);
-		}
-		cout << endl;
-	}
-	*/
-
 	World world(inputMap);
-    
-    world.showWorld();
+	world.showWorld();
 
-	for (int i = 0; i < EPOCHS; i++) {
-	
-		if (world.moveCreatures()) {
-			cout << "Iteration " << i << endl;
-			world.showWorld();
-		} else {
-			cout << "World terminated " << endl;
-			break;
-		}
-	}
+	for (int i = 0; i < 1; i++) {
 
-	int ind = 0;
-	for (auto l : world.creatures) {
+		cout << "Generation " << i << endl;
+
+		// For each generation of the creatures, move them around for EPOCHS number of time
+		for (int j = 0; j < EPOCHS; j++) {
 		
-		cout << "Final fitness score of creature #" << ind << ": " << l.fitness << endl;
-		ind++;
-	}
+			if (world.moveCreatures()) {
+				cout << "Iteration " << j << " of Generation " << i << endl;
+				world.showWorld();
+			} else {
+				cout << "World terminated " << endl;
+				break;
+			}
+		}
 
+		// Final evaluation of each of the creatures
+		int ind = 0;
+		int maxInd = 0;
+		double min = 1 <<10;
+		double max = -1;
+		double sum = 0;
+		for (auto l : world.creatures) {
+			if (min > l.fitness) {
+				min = l.fitness;
+			}
+			if (max < l.fitness) {
+				max = l.fitness;
+				maxInd = ind;
+			}
+			sum += l.fitness;
+			cout << "Final fitness score of creature #" << ind << ": " << l.fitness << endl;
+			ind++;
+		}
+		double mean = sum/(ind + 1);
+		// Find the most fit individual and replicate its edges
+		cout << "The minimum fitness was " << min << endl;
+		cout << "The average fitness was " << mean << endl;
+		cout << "The maximum fitness was " << max << endl;
+		vector<edge> bestEdges = world.creatures[maxInd].NN.edges;
+		/*
+		cout << "Best edges " << endl;
+		for (auto as : bestEdges) {
+			cout << as.weight << " ";
+		}
+		cout << endl << endl;
+		*/
+
+		world.creatures.clear();
+		// world.newGenCreatures(bestEdges);
+	}
 	return 0;
 
 }

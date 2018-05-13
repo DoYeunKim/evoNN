@@ -50,6 +50,7 @@ class Creature {
 		// Inits
 		Creature();
 		Creature(int x, int y);
+		Creature(int x, int y, vector<edge>& inheritedE);
 		~Creature();
 
 		// Show the relevant informations on the creature

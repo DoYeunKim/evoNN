@@ -36,8 +36,8 @@ NeuralNet::NeuralNet(double learningRate, int input) {
 	setEdges(input);
 }
 
-NeuralNet::NeuralNet(vector<edge> inheritedE, double learningRate) {
-	lRate = learningRate;
+NeuralNet::NeuralNet(vector<edge>& inheritedE) {
+	lRate = DEF_LRATE;
 	initOutput();
 	edges = inheritedE;
 }

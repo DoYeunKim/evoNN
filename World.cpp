@@ -70,20 +70,37 @@ void World::populateCreature() {
 		y = rand() % mapY;
 		cout << "Creature " << currNum << " placed at (" << x << "," << y << ")" << endl;	
 
-	
 		// Create new creature and place it.
 		// Update the total number of creatures in the cell
 		Creature c(x,y);
 		creatures.push_back(c);
 		map[y][x].cellPop++;
-		//cout << "(" << x << "," << y << ")" << endl;
 		currNum++;
 	}
-	/*
-	for (vector<Creature>::iterator it = creatures.begin(); it != creatures.end(); it++) {
-		cout << it->c_x << "," << it->c_y << endl;
+}
+
+
+// The new generation of creatures
+// Until the quota of creatures is met, populate the map, checking for collision
+void World::newGenCreatures(vector<edge>& inheritedE) {
+	int x, y;
+	int currNum = creatures.size();
+	// Until the quota is met
+	srand(time(NULL));
+
+	while (currNum != popSize) {
+		// Random seed
+		x = rand() % mapX;
+		y = rand() % mapY;
+		cout << "Creature " << currNum << " placed at (" << x << "," << y << ")" << endl;	
+
+		// Create new creature and place it.
+		// Update the total number of creatures in the cell
+		Creature c(x,y, inheritedE);
+		creatures.push_back(c);
+		map[y][x].cellPop++;
+		currNum++;
 	}
-	*/
 }
 
 // Show the world so that we can know what is going on
@@ -94,6 +111,7 @@ void World::showWorld() {
 		for (int j = 0; j < mapX; j++) {
 			printf("%2d, %1.1lf|", map[j][i].cellPop, map[j][i].nourishment);
 			// printf("%2.2lf ", map[j][i].nourishment);
+			// printf("%2d ", map[j][i].cellPop);
 		}
 		cout << endl;
 	}
@@ -140,7 +158,7 @@ bool World::moveCreatures() {
 			it->energy--;
 			int eaten = 0;
 			double currN = map[y][x].nourishment;
-			cout << "Found: " << currN << endl;
+			cout << "Found: " << currN << " food " << endl;
 			if (currN >= CONSUME_PER_CREATURE) {
 				map[y][x].nourishment -= CONSUME_PER_CREATURE;
 				eaten = ENERGY_INTAKE;
@@ -176,14 +194,11 @@ bool World::moveCreatures() {
 					cout << "Creature died" << endl;
 					survived--;
 					map[y][x].cellPop--;		
-					cout << "The final fitness of this animal is: " << it-> fitness << endl;
 					continue; 
 				}
 			}
 
 			it->fitness += map[y][x].nourishment;
-			cout << "The current fitness of this animal is: " << it-> fitness << endl;
-			//it->NN.inputLayer = calcVision(x, y, it->vision);
 
 			// Calculating dx and dy
 			// This will be provided by NN as I move along
@@ -206,20 +221,15 @@ bool World::moveCreatures() {
 
 			it->NN.trainWeights(calculatedV);
 
-			//cout << "Now at (" << it->c_x << "," << it->c_y << ")" << endl;
-			cout << "Current energy level is " << it->energy << endl;
+			// cout << "Now at (" << it->c_x << "," << it->c_y << ")" << endl;
+			// cout << "Current energy level is " << it->energy << endl;
 		}
 		
 	}
 	cout << survived << " creatures survived this round" << endl << endl << endl;
 
 	// Call populate food
-	// If the creatures ate something, food will be repopulated
-	// Else, nothing happens
-	// I will probably stagnate this as we may not want indefinite abundance of creatures
-	if (foodEaten) {
-		populateFood();
-	}
+	populateFood();
 	return true;
 }
 
@@ -242,7 +252,7 @@ vector<double> World::calcVision(int x, int y, int v) {
 		}
 		// cout << endl;
 	}
-	cout << endl;
+	// cout << endl;
 	return v_field;	
 }	
 

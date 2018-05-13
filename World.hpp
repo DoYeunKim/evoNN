@@ -9,7 +9,7 @@
 
 #define MIN_SUS 0.0
 #define MAX_SUS 1.0
-#define DEFAULT_POP 10
+#define DEFAULT_POP 100
 #define DEF_REGEN 0.005
 
 
@@ -55,6 +55,7 @@ class  World {
 		void initWorld(vector< vector<double> >& i_map);
         void populateFood();
 		void populateCreature();
+		void newGenCreatures(vector<edge>& inheritedE);
 	
 		// Display the world
         void showWorld();

@@ -12,7 +12,8 @@ Creature::Creature() {
 Creature::Creature(int x, int y) {
     c_x = x;
     c_y = y;
-	int visInput = (4 * vision) * (vision + 1);
+	int visAx = 2 * vision + 1; // Each side of the square visual field is 2 * vision + 1 (e.g. 5 for vision = 1)
+	int visInput = 2 * visAx * visAx; // Multiply by 2 because we have nourishment and danger to account for
 	// cout << "The size of input layer is: " << visInput << endl;
 	NeuralNet NN(visInput);
 }
@@ -21,7 +22,7 @@ Creature::Creature(int x, int y, vector<edge>& inheritedE) {
 	c_x = x;
 	c_y = y;
 	vector<edge> e = inheritedE;
-	NeuralNet NN(inheritedE);
+	NeuralNet NN(e);
 }
 
 Creature::~Creature() {
@@ -50,7 +51,7 @@ void Creature::move(int dir) {
 
 	c_x += (dis.dx) * speed;
 	c_y += (dis.dy) * speed;
-	cout << "Moving by (" << dis.dy << "," << dis.dx << ")" << endl;
+	// cout << "Moving by (" << dis.dy << "," << dis.dx << ")" << endl;
 	if (dis.dx + dis.dy > 0) {
 		energy -= walkEnergy;
 	}

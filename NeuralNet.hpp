@@ -2,9 +2,10 @@
 #define NEURAL_NET_HPP
 
 #include <iostream>
+#include <random>
 #include <vector>
 #define OUT_SIZE 9
-#define DEF_IN 8
+#define DEF_IN 16
 #define BIAS 1
 #define EDGE_INIT 0.15
 #define SHIFT_DEFAULT 0.5

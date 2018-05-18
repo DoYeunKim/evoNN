@@ -14,8 +14,10 @@ double derivAF(double x) {
 }
 
 double doubleInRange(double lower, double upper) {
-	double randNum = rand() / ((double) RAND_MAX);
-	return lower + randNum * (upper - lower);
+	random_device rd; // Obtain random seed for random number engine
+	mt19937_64 gen(rd()); // Standard64-bit  mersenne_twister_engine seeded with rd()
+	uniform_real_distribution<> dis(lower, upper);
+	return dis(gen);
 }
 
 NeuralNet::NeuralNet() {
@@ -39,6 +41,7 @@ NeuralNet::NeuralNet(double learningRate, int input) {
 NeuralNet::NeuralNet(vector<edge>& inheritedE) {
 	lRate = DEF_LRATE;
 	initOutput();
+	edges.clear();
 	edges = inheritedE;
 }
 

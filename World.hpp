@@ -9,8 +9,8 @@
 
 #define MIN_SUS 0.0
 #define MAX_SUS 1.0
-#define DEFAULT_POP 100
-#define DEF_REGEN 0.005
+#define DEFAULT_POP 10
+#define DEF_REGEN 0.001
 
 
 using namespace std;
@@ -18,8 +18,10 @@ using namespace std;
 // Each food is a struct
 // with x and y coordinate
 typedef struct _cell {
-    int cellPop;
+    char terrain;
+	int cellPop;
 	double nourishment;
+	double danger;
 
 } cell;
 
@@ -48,24 +50,24 @@ class  World {
 		vector<Creature> creatures;
 		//inits
         World();
-        World(vector< vector<double> >& inputMap);
+        World(vector< vector<char> >& terrainMap, vector< vector<double> >& foodMap, vector< vector<double> >& dangerMap);
         ~World();
 
 		// Populate the world
-		void initWorld(vector< vector<double> >& i_map);
+		void initWorld(vector< vector<char> >& t_map, vector< vector<double> >& f_map, vector< vector<double> >& d_map);
         void populateFood();
 		void populateCreature();
 		void newGenCreatures(vector<edge>& inheritedE);
 	
 		// Display the world
-        void showWorld();
+        void showWorld(int mapType);
 
 		// Functions dealing with moving the creatures
 		// showPos checks if it is possible for the creature to move into that space
 		// moveCreatures calls Creature.move() to actually do the moving if showPos returns true
         bool showPos(int x, int y);
 		bool moveCreatures();
-		vector<double> calcVision(int x, int y, int v);
+		vector<double> calcVision(int x, int y, int v, int type);
 
 };
 

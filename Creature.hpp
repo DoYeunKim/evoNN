@@ -6,16 +6,17 @@
 #include "shared.hpp"
 
 #define ENERGY_INTAKE 3
-#define CONSUME_PER_CREATURE 0.01
+#define CONSUME_PER_CREATURE 0.03
 #define STARVATION 5
-#define NO_FOOD -5
+#define NO_FOOD -4
+#define EVADE 1
 
 // The main class of Creature
 // I will be adding multiple species that are inherited Creatures
 class Creature {
 	private:
 		int speed = 1;
-		int walkEnergy = 2;
+		int walkEnergy = 1;
 
 	public:
 		// enum for switch function
@@ -26,7 +27,7 @@ class Creature {
 		int c_x, c_y;
 		// The level of energy.
 		// Moving around reduces energy, and eating will restore energy
-		int energy = 10;
+		int energy = 15;
 		// Check if the creature is dead
 		bool isAlive = true;
 		// Check if the creature is starved (energy = 0)
@@ -38,7 +39,7 @@ class Creature {
 		// How healthy the animal is
 		// Whenever it is hurt or has been starving, it will be lowered
 		// and if health <= 0, then it dies 
-		int health = 1;
+		int health = 5;
 		// The speed at which the animal trasverses the world
 		// As of now, I'm not sure how I will use this, but it most likley will depend
 		// on the "species"

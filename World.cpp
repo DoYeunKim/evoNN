@@ -129,7 +129,7 @@ void World::showWorld(int mapType) {
 			cout << "# creatures, nourishment, danger, terrain " << endl;
 			for (int i = 0; i < mapY; i++) {
 				for (int j = 0; j < mapX; j++) {
-					printf("%2d,%1.1lf,%1.1lf,%c ", map[j][i].cellPop, map[j][i].nourishment, map[j][i].danger, map[j][i].terrain);
+					printf("%2d,%1.2lf,%1.2lf,%c ", map[j][i].cellPop, map[j][i].nourishment, map[j][i].danger, map[j][i].terrain);
 				}
 				cout << endl;
 			} 
@@ -139,7 +139,7 @@ void World::showWorld(int mapType) {
 			cout << "nourishment, danger, terrain " << endl;
 			for (int i = 0; i < mapY; i++) {
 				for (int j = 0; j < mapX; j++) {
-					printf("%2.2lf,%2.2lf,%c ", map[j][i].nourishment, map[j][i].danger, map[j][i].terrain);
+					printf("%1.2lf,%1.2lf,%c ", map[j][i].nourishment, map[j][i].danger, map[j][i].terrain);
 				}
 				cout << endl;
 			}
@@ -159,7 +159,7 @@ void World::showWorld(int mapType) {
 			cout << "# creatures, danger " << endl;
 			for (int i = 0; i < mapY; i++) {
 				for (int j = 0; j < mapX; j++) {
-					printf("%2d,%2.2lf ", map[j][i].cellPop, map[j][i].danger);
+					printf("%2d,%1.2lf ", map[j][i].cellPop, map[j][i].danger);
 				}
 				cout << endl;
 			}
@@ -169,7 +169,7 @@ void World::showWorld(int mapType) {
 			cout << "# creatures, nourishment " << endl;
 			for (int i = 0; i < mapY; i++) {
 				for (int j = 0; j < mapX; j++) {
-					printf("%2d,%2.2lf ", map[j][i].cellPop, map[j][i].nourishment);
+					printf("%2d,%1.2lf ", map[j][i].cellPop, map[j][i].nourishment);
 				}
 				cout << endl;
 			}
@@ -189,7 +189,7 @@ void World::showWorld(int mapType) {
 			cout << "nourishment " << endl;
 			for (int i = 0; i < mapY; i++) {
 				for (int j = 0; j < mapX; j++) {
-					printf("%2.2lf ", map[j][i].nourishment);
+					printf("%1.2lf ", map[j][i].nourishment);
 				}
 				cout << endl;
 			}
@@ -199,7 +199,7 @@ void World::showWorld(int mapType) {
 			cout << "danger " << endl;
 			for (int i = 0; i < mapY; i++) {
 				for (int j = 0; j < mapX; j++) {
-					printf("%2.2lf ", map[j][i].danger);
+					printf("%1.2lf ", map[j][i].danger);
 				}
 				cout << endl;
 			}
@@ -280,7 +280,7 @@ bool World::moveCreatures() {
 				if (exposeDanger < currD) it->health--;
 				if(it->health <= 0) { 
 					it->isAlive = false;
-					cout << "Creature killed" << endl;
+					//cout << "Creature killed" << endl;
 					survived--;
 					map[y][x].cellPop--;		
 					continue; 

@@ -39,15 +39,16 @@ class  World {
         int mapX, mapY;
 		// The maximum amount of creatures that we want on the world
 		int popSize;
-		// The map
-		// The current map comprises of cells that contain nourishment score and the number of
-		// creatures currently there. 
-        vector< vector<cell> > map;
+
 
     public:
 		int survived;
 		// These vectors are constantly updated and it is easier to have them here
 		vector<Creature> creatures;
+		// The map
+		// The current map comprises of cells that contain nourishment score, danger score,
+		// type of terrain, and the number of creatures currently there. 
+        vector< vector<cell> > map;
 		//inits
         World();
         World(vector< vector<char> >& terrainMap, vector< vector<double> >& foodMap, vector< vector<double> >& dangerMap);

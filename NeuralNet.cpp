@@ -4,15 +4,18 @@
 
 using namespace std;
 
+// A simple sigmoidal activation function
 double activationFunction(double x) {
 	return 1.0 / (1 + exp(-x + SHIFT_DEFAULT));
 }
 
+// Derivative of activation function
 double derivAF(double x) {
 	double gOfIn = activationFunction(x);
 	return gOfIn * (1 - gOfIn);
 }
 
+// Return a double value of edge weights
 double doubleInRange(double lower, double upper) {
 	random_device rd; // Obtain random seed for random number engine
 	mt19937_64 gen(rd()); // Standard64-bit  mersenne_twister_engine seeded with rd()
@@ -20,24 +23,28 @@ double doubleInRange(double lower, double upper) {
 	return dis(gen);
 }
 
+// Default Constructor
 NeuralNet::NeuralNet() {
 	lRate = DEF_LRATE;
 	initOutput();
 	setEdges(DEF_IN);
 }
 
+// Constructor that creates an input layer of given size
 NeuralNet::NeuralNet(int input) {
 	lRate = DEF_LRATE;
 	initOutput();
 	setEdges(input);
 }
 
+// Constructor that creates an input layer of given size using input learning rate
 NeuralNet::NeuralNet(double learningRate, int input) {
 	lRate = learningRate;
 	initOutput();
 	setEdges(input);
 }
 
+// Constructor that takes in a vector of edges and "inherits" it.
 NeuralNet::NeuralNet(vector<edge>& inheritedE) {
 	lRate = DEF_LRATE;
 	initOutput();
@@ -62,24 +69,45 @@ void NeuralNet::trainWeights(vector<double> input) {
 	
 }
 
+// Evaluate the fitness of the movement the creature is making
 vector<double> NeuralNet::evalMovement(vector<double> input) {
-	vector<double> eval(OUT_SIZE, 0);
+	int iSize = input.size();
+	if (iSize == 0) exit(1);
+	vector<double> eval(OUT_SIZE, 0.0);
+	// Because input is now nourishment + danger, it is always going to have even number of entries.
+	// No need to check for ramainders
+	int NDdivide = iSize/2;
 
 	// Obtain the mean value of the visible field
-	double max = -1;
-	double sum = 0;
-	for (auto mov : input) {
-		if (mov > max) {
-			max = mov;
-		};
-		sum += mov;
+	double maxN = -1.0;
+	double sumN = 0.0;
+	double maxD = -1.0;
+	double sumD = 0.0;
+
+	// Get maximum nourishment and the sum to get average
+	for (int i = 0; i < NDdivide; i++) {
+		if (input[i] > maxN) maxN = input[i];
+		sumN += input[i];
+	}
+	// Get maximum danger and the sum to get average
+	for (int j = NDdivide; j < iSize; j++) {
+		if (input[j] > maxD) maxD = input[j];
+		sumD += input[j];
 	}
 
-	double mean = sum / OUT_SIZE;
-	double standard = max - mean;
-	for (int i = 0; i < OUT_SIZE; i++) {
-		eval[i] = input[i] - standard;
-		// cout << "Evaluation for tile " << i << ": " << eval[i] << endl;
+	// Reward nourishment
+	double meanN = ((double) sumN) / ((double) NDdivide);
+	double standardN = maxN - meanN;
+	for (int i = 0; i < NDdivide; i++) {
+		eval[i] += input[i] - standardN;
+	}
+
+	// Penalize danger
+	double meanD = ((double) sumD) / ((double) NDdivide);
+	double standardD = maxD - meanD;
+	
+	for (int j = NDdivide; j < iSize; j++) {
+		eval[j - NDdivide] -= (input[j] - standardD);
 	}
 
 	return eval;
@@ -149,6 +177,7 @@ void NeuralNet::setEdges(int input) {
 	}
 }
 
+// Initialize output to 0.0
 void NeuralNet::initOutput() {
 	vector <double> vect (OUT_SIZE, 0.0);
 	outputLayer = vect;

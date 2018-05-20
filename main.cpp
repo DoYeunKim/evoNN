@@ -5,8 +5,8 @@
 #include <thread>
 #include <unistd.h> // opterr
 #include "World.hpp"
-#define EPOCHS 100
-#define GENERATIONS 10
+#define EPOCHS 200
+#define GENERATIONS 50
 
 
 using namespace std;
@@ -166,7 +166,7 @@ void convertTerrain(vector< vector<char> >& inputTer, vector< vector<int> >& tem
 
 int main(int argc, char** argv) {
 	
-	int mapType = 4;
+	int mapType = 0;
 
 	int epochs = EPOCHS;
 	int numCreature = DEFAULT_POP;
@@ -206,6 +206,7 @@ int main(int argc, char** argv) {
 
 	World world(inputTer, inputNour, inputDan);
 	cout << "Created world" << endl;
+	world.showWorld(1);
 
 	for (int i = 0; i < GENERATIONS; i++) {
 		cout << "Generation " << i << endl;
@@ -247,6 +248,7 @@ int main(int argc, char** argv) {
 		cout << "The maximum fitness was " << max << endl;
 		cout << endl;
 		vector<edge> bestEdges = world.creatures[maxInd].NN.edges;
+
 		/*
 		cout << "Best edges " << endl;
 		for (auto as : bestEdges) {
@@ -261,6 +263,7 @@ int main(int argc, char** argv) {
 	
 		this_thread::sleep_for(chrono::seconds(2));		
 	}
+	
 	return 0;
 
 }

@@ -44,7 +44,7 @@ class Creature {
 		// As of now, I'm not sure how I will use this, but it most likley will depend
 		// on the "species"
 		// The area of visual field, n block radius of the animal (n = |dx| + |dy|)
-		int vision = 2;
+		int vision = 1;
 
 		NeuralNet NN;
 
